@@ -1,11 +1,8 @@
-from art_brain_robot_interface import ArtBrainRobotInterface
+from art_brain import ArtBrainRobotInterface, ArtGripper, ArtBrainUtils
 from geometry_msgs.msg import PoseStamped
 import rospy
-from art_gripper import ArtGripper
-from brain_utils import ArtBrainUtils
-from art_msgs.srv import ReinitArmsRequest, ReinitArmsResponse
 from art_msgs.msg import ObjInstance
-from std_srvs.srv import TriggerResponse, TriggerRequest, Trigger
+from std_srvs.srv import TriggerRequest, Trigger
 from std_msgs.msg import Bool
 from std_srvs.srv import Empty, EmptyRequest
 from geometry_msgs.msg import PointStamped
