@@ -362,7 +362,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
 
       p.pose.position.x = 1.69;
 
-      if (obj.type.name == "wood_46_150")
+      if (obj.type.name == "Stretcher" || obj.type.name == "Spojka")
       {
         p.pose.position.y = 0.6;
         p.pose.position.z = 0.185;
@@ -371,16 +371,16 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
         p.pose.orientation.z = -0.373;
         p.pose.orientation.w = 0.586;
       }
-      else if (obj.type.name == "wood_46_300")
+      else if (obj.type.name == "ShortLeg" || obj.type.name == "Kratka_noha")
       {
-        p.pose.position.y = 0.357;
+        p.pose.position.y = 0.347; // spravne ma byt 0.357
         p.pose.position.z = 0.168;
         p.pose.orientation.x = 0.5705;
         p.pose.orientation.y = 0.4311;
         p.pose.orientation.z = -0.4121;
         p.pose.orientation.w = 0.5645;
       }
-      else if (obj.type.name == "wood_46_400")
+      else if (obj.type.name == "LongLeg" || obj.type.name == "Dloouha_noha")
       {
         p.pose.position.y = 0.6;
         p.pose.position.z = 0.39;
@@ -396,7 +396,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
 
       p.pose.position.x = -0.165;
 
-      if (obj.type.name == "wood_46_150")
+      if (obj.type.name == "Stretcher" || obj.type.name == "Spojka")
       {
         p.pose.position.y = 0.6;
         p.pose.position.z = 0.17;
@@ -405,7 +405,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
         p.pose.orientation.z = 0.5858;
         p.pose.orientation.w = 0.4222;
       }
-      else if (obj.type.name == "wood_46_300")
+      else if (obj.type.name == "ShortLeg" || obj.type.name == "Kratka_noha")
       {
         p.pose.position.y = 0.357;
         p.pose.position.z = 0.1958;
@@ -414,7 +414,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
         p.pose.orientation.z = 0.5737;
         p.pose.orientation.w = 0.4161;
       }
-      else if (obj.type.name == "wood_46_400")
+      else if (obj.type.name == "LongLeg" || obj.type.name == "Dlouha_noha")
       {
         p.pose.position.y = 0.6;
         p.pose.position.z = 0.43;
@@ -441,6 +441,9 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
     objects_->setPose(object_id, p);
     objects_->publishObject(object_id);
   }
+
+  ROS_WARN_STREAM(obj.type.name);
+  ROS_WARN_STREAM(obj.pose);
 
   // visualization only -> published by publishCollisionBB
   // visual_tools_->publishBlock(objects_[id].p, moveit_visual_tools::ORANGE,

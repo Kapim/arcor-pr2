@@ -14,8 +14,4 @@
 	<include file="$(find art_pr2_moveit_config)/launch/move_group.launch"></include>
 	<node pkg="art_pr2_arm_navigation" name="pr2_arm_nav_node" type="node.py" output="screen"/>
 
-    <include file="$(find art_brain)/launch/brain.launch">
-        <arg name="robot_interface" value="art_pr2_interface.ArtPr2Interface"/>
-    </include>
-
 </launch>
