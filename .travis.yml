@@ -109,7 +109,7 @@ script:
   - catkin build
   - source devel/setup.bash
   - catkin_lint $CI_SOURCE_PATH
-  - cd ~/catkin_ws/src/artable-utils
+  - cd ~/catkin_ws/src/artable-pr2
   - chmod +x run_tests.sh
   - ./run_tests.sh
 
