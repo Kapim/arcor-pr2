@@ -12,6 +12,7 @@
 #include "art_msgs/ObjInstance.h"
 #include "art_msgs/ObjectType.h"
 #include "art_msgs/getObjectType.h"
+#include "art_msgs/PoseStampedTrigger.h"
 #include <boost/thread/recursive_mutex.hpp>
 #include <moveit_visual_tools/visual_tools.h>
 #include <stdexcept>
@@ -54,8 +55,6 @@ public:
 
   void setPaused(bool paused, bool clear = false);
 
-  void publishObject(std::string object_id);
-
   void setPose(std::string object_id, geometry_msgs::PoseStamped ps);
 
 private:
@@ -73,13 +72,14 @@ private:
 
   void detectedObjectsCallback(const art_msgs::InstancesArrayConstPtr& msg);
 
-  moveit_visual_tools::VisualToolsPtr visual_tools_;
-
   std::set<std::string> grasped_objects_;
 
   bool paused_;
 
   TObjCache obj_cache_;
+  
+  ros::ServiceClient ce_set_pose_srv_;
+  
 };
 
 }  // namespace art_pr2_grasping

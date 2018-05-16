@@ -79,6 +79,8 @@ artPr2Grasping::artPr2Grasping(boost::shared_ptr<tf::TransformListener> tfl, boo
   place_pose_pub_ = nh_.advertise<geometry_msgs::PoseArray>("/art/robot/" + group_name_ + "/debug/place_pose", 1, true);
 
   look_at_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/art/robot/look_at", 10);
+  
+  ce_clear_out_of_table_srv_ = nh_.serviceClient<art_msgs::StringTrigger>("/art/collision_env/detected/out_of_table/clear/except");
 
   publishObject();
 }
@@ -431,15 +433,9 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
   }
   p.header.stamp = ros::Time::now();
 
-  if (!transformPose(p))
-  {
-    return false;
-  }
-
   if (feeder)
   {
     objects_->setPose(object_id, p);
-    objects_->publishObject(object_id);
   }
 
   ROS_WARN_STREAM(obj.type.name);
@@ -457,10 +453,19 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
   }
 
   look_at(p);
-  objects_->setPaused(true, feeder);
 
   if (feeder)
   {
+  
+    art_msgs::StringTrigger srv;
+    srv.request.str = object_id;
+    
+    if (!ce_clear_out_of_table_srv_.call(srv) || not srv.response.success) {
+  
+      ROS_ERROR_NAMED(group_name_, "Failed to clear objects.");
+      return false;
+    }
+    
     // remove side (checked in object coordinates) and top grasps (checked in planning frame)
 
     std::vector<moveit_msgs::Grasp> tmp;
@@ -617,136 +622,6 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
 
   ROS_INFO_NAMED(group_name_, "Picked the object.");
   publishObject(obj);
-  return true;
-}
-
-// TODO(ZdenekM): move to Objects? Or somewhere else?
-bool artPr2Grasping::addTable(std::string frame_id)
-{
-  // visual_tools_->cleanupCO("table");
-  geometry_msgs::PoseStamped ps;
-  ps.header.frame_id = frame_id;
-  ps.pose.position.x = 1.5 / 2;
-  ps.pose.position.y = 0.7 / 2;
-  ps.pose.orientation.w = 1.0;
-
-  if (!transformPose(ps))
-    return false;
-
-  geometry_msgs::PoseStamped k1;
-  k1.header.frame_id = "n1_kinect2_link";
-  k1.pose.orientation.w = 1.0;
-
-  if (!transformPose(k1))
-    return false;
-
-  geometry_msgs::PoseStamped k2;
-  k2.header.frame_id = "n2_kinect2_link";
-  k2.pose.orientation.w = 1.0;
-
-  if (!transformPose(k2))
-    return false;
-
-  tf::Quaternion q(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w);
-  tf::Matrix3x3 m(q);
-  double roll, pitch, yaw;
-  m.getRPY(roll, pitch, yaw);
-
-  float table_x = 1.5;
-  float table_y = 0.7;
-  float feeder_depth = 0.35;
-  float feeder_front_to_table = 0.15;
-
-  geometry_msgs::PoseStamped g1ps;
-  g1ps.header.frame_id = frame_id;
-  g1ps.pose.position.x = table_x + feeder_depth / 2 + feeder_front_to_table;
-  g1ps.pose.position.y = 0.515;
-  g1ps.pose.orientation.w = 1.0;
-
-  if (!transformPose(g1ps))
-    return false;
-
-  geometry_msgs::PoseStamped g2ps;
-  g2ps.header.frame_id = frame_id;
-  g2ps.pose.position.x = -(feeder_depth / 2 + feeder_front_to_table);  // 0.08
-  g2ps.pose.position.y = 0.515;
-  g2ps.pose.orientation.w = 1.0;
-
-  if (!transformPose(g2ps))
-    return false;
-
-  for (int j = 0; j < 1; j++)  // hmm, sometimes the table is not added
-  {
-    //  x, y, angle, width, height, depth
-    visual_tools_->publishCollisionTable(ps.pose.position.x,
-                                         ps.pose.position.y, yaw - 3.14 / 2,
-                                         table_x,
-                                         ps.pose.position.z,
-                                         table_y,
-                                         "table");
-
-    // TODO(zdenekm): transform each part of each feeder separately
-
-    visual_tools_->publishCollisionTable(g1ps.pose.position.x + 0.32,
-                                         g1ps.pose.position.y, 0,
-                                         feeder_depth,
-                                         g1ps.pose.position.z + 0.18,
-                                         0.001,
-                                         "feeder-1-front");
-    visual_tools_->publishCollisionTable(g1ps.pose.position.x,
-                                         g1ps.pose.position.y,
-                                         0,
-                                         feeder_depth,
-                                         g1ps.pose.position.z + 0.34,
-                                         0.001,
-                                         "feeder-1-middle");
-    visual_tools_->publishCollisionTable(g1ps.pose.position.x - 0.18,
-                                         g1ps.pose.position.y,
-                                         0,
-                                         feeder_depth,
-                                         g1ps.pose.position.z + 0.34,
-                                         0.001,
-                                         "feeder-1-rear");
-    geometry_msgs::PoseStamped b1 = g1ps;
-    b1.pose.position.x -=  0.09;
-    b1.pose.position.z += 0.3;
-    b1.pose.position.y -= feeder_depth / 2 - 0.05;
-    // visual_tools_->publishCollisionBlock(b1.pose, "feeder-1-block", 0.05);
-
-    visual_tools_->publishCollisionTable(g2ps.pose.position.x + 0.32,
-                                         g2ps.pose.position.y,
-                                         0,
-                                         feeder_depth,
-                                         g2ps.pose.position.z + 0.18,
-                                         0.001,
-                                         "feeder-2-front");
-    visual_tools_->publishCollisionTable(g2ps.pose.position.x,
-                                         g2ps.pose.position.y,
-                                         0,
-                                         feeder_depth,
-                                         g2ps.pose.position.z + 0.39,
-                                         0.001,
-                                         "feeder-2-middle");
-    visual_tools_->publishCollisionTable(g2ps.pose.position.x - 0.18,
-                                         g2ps.pose.position.y,
-                                         0,
-                                         feeder_depth,
-                                         g2ps.pose.position.z + 0.39,
-                                         0.001,
-                                         "feeder-2-rear");
-    geometry_msgs::PoseStamped b2 = g2ps;
-    b2.pose.position.x -=  0.09;
-    b2.pose.position.z += 0.3;
-    b2.pose.position.y += feeder_depth / 2 - 0.05;
-    // visual_tools_->publishCollisionBlock(b2.pose, "feeder-2-block", 0.05);
-
-    visual_tools_->publishCollisionBlock(k1.pose, "kinect-n1", 0.3);
-    visual_tools_->publishCollisionBlock(k2.pose, "kinect-n2", 0.3);
-
-    move_group_->setSupportSurfaceName("table");
-    // ros::Duration(0.1).sleep();
-  }
-
   return true;
 }
 

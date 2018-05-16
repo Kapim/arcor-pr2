@@ -10,6 +10,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <art_msgs/PickPlaceAction.h>
 #include <tf/transform_listener.h>
+#include <std_srvs/Empty.h>
 
 namespace art_pr2_grasping
 {
@@ -26,6 +27,13 @@ private:
   int max_attempts_;
 
   void executeCB(const art_msgs::PickPlaceGoalConstPtr& goal);
+  
+  ros::ServiceClient ce_pause_srv_;
+  ros::ServiceClient ce_resume_srv_;
+  
+  void ce_pause();
+  void ce_resume();
+  
 };
 }  // namespace art_pr2_grasping
 

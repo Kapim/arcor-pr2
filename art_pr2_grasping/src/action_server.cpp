@@ -11,6 +11,22 @@ artActionServer::artActionServer(boost::shared_ptr<tf::TransformListener> tfl, b
 {
   as_.reset(new actionlib::SimpleActionServer<art_msgs::PickPlaceAction>(
               nh_, "/art/robot/" + group_name_ + "/pp", boost::bind(&artActionServer::executeCB, this, _1), false));
+              
+  ce_pause_srv_ = nh_.serviceClient<std_srvs::Empty>("/art/collision_env/pause");
+  ce_resume_srv_ = nh_.serviceClient<std_srvs::Empty>("/art/collision_env/resume");
+              
+}
+
+void artActionServer::pause() {
+
+  std_srvs::Empty srv;
+  ce_pause_srv_.call(srv);
+}
+
+void artActionServer::resume() {
+
+  std_srvs::Empty srv;
+  ce_resume_srv_.call(srv);
 }
 
 bool artActionServer::init()
@@ -27,12 +43,6 @@ bool artActionServer::init()
     return false;
   }
 
-  if (!addTable("marker"))
-  {
-    ROS_ERROR("failed to add table");
-    return false;
-  }
-
   as_->start();
   return true;
 }
@@ -44,9 +54,6 @@ void artActionServer::executeCB(const art_msgs::PickPlaceGoalConstPtr& goal)
 
   ROS_INFO_STREAM_NAMED(group_name_, "Got goal, operation: " << goal->operation);
 
-  // TODO(ZdenekM): hack - table sometimes gets deleted from planning scene
-  addTable("marker");
-
   // TODO(ZdenekM): check /art/pr2/xyz_arm/interaction/state topic?
 
   switch (goal->operation)
@@ -54,11 +61,10 @@ void artActionServer::executeCB(const art_msgs::PickPlaceGoalConstPtr& goal)
   case art_msgs::PickPlaceGoal::RESET:
   {
     ROS_INFO_NAMED(group_name_, "RESET");
-    objects_->setPaused(false);
+    resume();
     move_group_->detachObject();
     grasped_object_.reset();
     objects_->clear();
-    // publishObject(); // WTF?
 
     res.result = art_msgs::PickPlaceResult::SUCCESS;
     as_->setSucceeded(res);
@@ -89,7 +95,7 @@ void artActionServer::executeCB(const art_msgs::PickPlaceGoalConstPtr& goal)
       return;
     }
 
-    objects_->setGrasped(goal->object, true);  // will stop publishing it to collision scene
+    objects_->setGrasped(goal->object, true);
 
     int tries = max_attempts_;
 
@@ -103,17 +109,18 @@ void artActionServer::executeCB(const art_msgs::PickPlaceGoalConstPtr& goal)
       tries--;
       as_->publishFeedback(f);
 
+      pause();
+
       grasped = pick(goal->object, goal->operation == art_msgs::PickPlaceGoal::PICK_FROM_FEEDER);  // todo flag if it
       // make sense to
       // try again
 
-      objects_->setPaused(false);
+      resume();
 
       // (type of failure)
       if (grasped)
         break;
 
-      objects_->publishObject(goal->object);
     }
 
     if (as_->isPreemptRequested())
