@@ -354,7 +354,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
   geometry_msgs::PoseStamped p = obj.pose;
   if (feeder)
   {
-    ROS_WARN_STREAM(p);
+    // ROS_WARN_STREAM(p);
 
     p.header.frame_id = "marker";
 
@@ -366,8 +366,8 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
 
       if (obj.type.name == "Stretcher" || obj.type.name == "Spojka")
       {
-        p.pose.position.y = 0.6;
-        p.pose.position.z = 0.185;
+        p.pose.position.y = (0.7+(0.7-0.18))/2.0;
+        p.pose.position.z = 0.19;
         p.pose.orientation.x = 0.6;
         p.pose.orientation.y = 0.395;
         p.pose.orientation.z = -0.373;
@@ -375,16 +375,16 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
       }
       else if (obj.type.name == "ShortLeg" || obj.type.name == "Kratka_noha")
       {
-        p.pose.position.y = 0.347; // spravne ma byt 0.357
-        p.pose.position.z = 0.168;
+        p.pose.position.y = ((0.7-0.495)+(0.7-0.18))/2.0;
+        p.pose.position.z = 0.19;
         p.pose.orientation.x = 0.5705;
         p.pose.orientation.y = 0.4311;
         p.pose.orientation.z = -0.4121;
         p.pose.orientation.w = 0.5645;
       }
-      else if (obj.type.name == "LongLeg" || obj.type.name == "Dloouha_noha")
+      else if (obj.type.name == "LongLeg" || obj.type.name == "Dlouha_noha")
       {
-        p.pose.position.y = 0.6;
+        p.pose.position.y = (0.7+(0.7-0.18))/2.0;
         p.pose.position.z = 0.39;
         p.pose.orientation.x = 0.5831;
         p.pose.orientation.y = 0.4178;
@@ -400,7 +400,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
 
       if (obj.type.name == "Stretcher" || obj.type.name == "Spojka")
       {
-        p.pose.position.y = 0.6;
+        p.pose.position.y = (0.7+(0.7-0.18))/2.0;
         p.pose.position.z = 0.17;
         p.pose.orientation.x = -0.4094;
         p.pose.orientation.y = 0.5576;
@@ -409,7 +409,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
       }
       else if (obj.type.name == "ShortLeg" || obj.type.name == "Kratka_noha")
       {
-        p.pose.position.y = 0.357;
+        p.pose.position.y = ((0.7-0.495)+(0.7-0.18))/2.0;
         p.pose.position.z = 0.1958;
         p.pose.orientation.x = -0.408;
         p.pose.orientation.y = 0.5753;
@@ -418,7 +418,7 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
       }
       else if (obj.type.name == "LongLeg" || obj.type.name == "Dlouha_noha")
       {
-        p.pose.position.y = 0.6;
+        p.pose.position.y = (0.7+(0.7-0.18))/2.0;
         p.pose.position.z = 0.43;
         p.pose.orientation.x = -0.387;
         p.pose.orientation.y = 0.5832;
@@ -436,10 +436,16 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
   if (feeder)
   {
     objects_->setPose(object_id, p);
+    // ros::Duration(10).sleep();
+  }
+
+  if (!transformPose(p))
+  {
+    return false;
   }
 
   ROS_WARN_STREAM(obj.type.name);
-  ROS_WARN_STREAM(obj.pose);
+  // ROS_WARN_STREAM(obj.pose);
 
   // visualization only -> published by publishCollisionBB
   // visual_tools_->publishBlock(objects_[id].p, moveit_visual_tools::ORANGE,

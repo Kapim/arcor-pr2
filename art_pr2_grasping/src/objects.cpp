@@ -195,6 +195,7 @@ void Objects::detectedObjectsCallback(const art_msgs::InstancesArrayConstPtr& ms
 void Objects::setPose(std::string object_id, geometry_msgs::PoseStamped ps)
 {
 
+  ROS_WARN_STREAM(ps);
   art_msgs::PoseStampedTrigger srv;
   srv.request.ps = ps;
   srv.request.str = object_id;

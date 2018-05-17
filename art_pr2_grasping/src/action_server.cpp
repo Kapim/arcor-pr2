@@ -17,13 +17,13 @@ artActionServer::artActionServer(boost::shared_ptr<tf::TransformListener> tfl, b
               
 }
 
-void artActionServer::pause() {
+void artActionServer::ce_pause() {
 
   std_srvs::Empty srv;
   ce_pause_srv_.call(srv);
 }
 
-void artActionServer::resume() {
+void artActionServer::ce_resume() {
 
   std_srvs::Empty srv;
   ce_resume_srv_.call(srv);
@@ -31,6 +31,23 @@ void artActionServer::resume() {
 
 bool artActionServer::init()
 {
+
+  while (!ce_pause_srv_.waitForExistence(ros::Duration(5.0)))  {
+  
+    ROS_INFO_STREAM_NAMED(group_name_, "Waiting for collision env services...");
+  }
+
+  while (!ce_resume_srv_.waitForExistence(ros::Duration(5.0)))  {
+  
+    ROS_INFO_STREAM_NAMED(group_name_, "Waiting for collision env services...");
+  }
+
+  while (!ce_clear_out_of_table_srv_.waitForExistence(ros::Duration(5.0)))  {
+  
+    ROS_INFO_STREAM_NAMED(group_name_, "Waiting for collision env services...");
+  }
+
+
   while (!tfl_->waitForTransform(getPlanningFrame(), "marker", ros::Time(0), ros::Duration(5.0)))
   {
     ROS_INFO_STREAM_NAMED(group_name_, "Waiting for transform...");
@@ -56,12 +73,14 @@ void artActionServer::executeCB(const art_msgs::PickPlaceGoalConstPtr& goal)
 
   // TODO(ZdenekM): check /art/pr2/xyz_arm/interaction/state topic?
 
+  move_group_->setSupportSurfaceName("table");
+
   switch (goal->operation)
   {
   case art_msgs::PickPlaceGoal::RESET:
   {
     ROS_INFO_NAMED(group_name_, "RESET");
-    resume();
+    ce_resume();
     move_group_->detachObject();
     grasped_object_.reset();
     objects_->clear();
@@ -109,13 +128,13 @@ void artActionServer::executeCB(const art_msgs::PickPlaceGoalConstPtr& goal)
       tries--;
       as_->publishFeedback(f);
 
-      pause();
+      ce_pause();
 
       grasped = pick(goal->object, goal->operation == art_msgs::PickPlaceGoal::PICK_FROM_FEEDER);  // todo flag if it
       // make sense to
       // try again
 
-      resume();
+      ce_resume();
 
       // (type of failure)
       if (grasped)
