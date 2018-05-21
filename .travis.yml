@@ -76,7 +76,7 @@ before_install:
   - sudo rosdep init
   - rosdep update
   - sudo pip install catkin-tools
-  - sudo apt-get install -y ros-indigo-moveit-ros-planning-interface
+  - sudo apt-get install -y ros-indigo-moveit-ros-warehouse
 
 # Create a catkin workspace with the package under integration.
 install:
