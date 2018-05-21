@@ -24,6 +24,7 @@
 #include <geometry_msgs/Pose.h>
 #include <pr2_controllers_msgs/JointControllerState.h>
 #include "art_msgs/ObjInstance.h"
+#include "art_msgs/StringTrigger.h"
 
 // adapted from
 // https://github.com/davetcoleman/baxter_cpp/blob/hydro-devel/baxter_pick_place/src/block_pick_place.cpp
@@ -69,6 +70,8 @@ protected:
 
   bool dont_try_again_;
 
+  ros::ServiceClient ce_clear_out_of_table_srv_;
+
 public:
   artPr2Grasping(boost::shared_ptr<tf::TransformListener> tfl, boost::shared_ptr<Objects> objects,
                  std::string group_name, std::string default_target, std::string gripper_state_topic);
@@ -86,8 +89,6 @@ public:
   void publishObject(TObjectInfo obj = TObjectInfo());
 
   bool pick(const std::string& object_id, bool feeder = false);
-
-  bool addTable(std::string frame_id);
 };
 }  // namespace art_pr2_grasping
 #endif  // ART_PR2_GRASPING_PR2GRASP_H

@@ -20,9 +20,9 @@ class ArtArmNavigationActionServer(object):
     def __init__(self, server_prefix, group_name):
         self.group_name = group_name
         self.group = moveit_commander.MoveGroupCommander(self.group_name)
+
         self._as = actionlib.SimpleActionServer(server_prefix + self.group_name + "/manipulation",
-                                                ArmNavigationAction, self.action_cb)
-        self._as.start()
+                                                ArmNavigationAction, self.action_cb, auto_start=False)
 
         char = self.group_name[0]
         self.jta = actionlib.SimpleActionClient('/' + char + '_arm_controller/joint_trajectory_action',
@@ -45,6 +45,7 @@ class ArtArmNavigationActionServer(object):
         self.tf_listener = TransformListener()
 
         self.look_at_pub = rospy.Publisher("/art/robot/look_at", PointStamped, queue_size=1)
+        self._as.start()
 
     def action_cb(self, goal):
         max_attempt = 3
