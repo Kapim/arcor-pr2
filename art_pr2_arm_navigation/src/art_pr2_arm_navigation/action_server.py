@@ -20,7 +20,7 @@ class ArtArmNavigationActionServer(object):
     def __init__(self, server_prefix, group_name):
         self.group_name = group_name
         self.group = moveit_commander.MoveGroupCommander(self.group_name)
-            
+
         self._as = actionlib.SimpleActionServer(server_prefix + self.group_name + "/manipulation",
                                                 ArmNavigationAction, self.action_cb, auto_start=False)
 
