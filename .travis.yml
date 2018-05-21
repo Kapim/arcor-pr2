@@ -94,8 +94,8 @@ install:
 before_script:
 
   # https://answers.ros.org/question/203542/moveit-installation/?answer=212933#post-id-212933
-  wget http://archive.ubuntu.com/ubuntu/pool/universe/a/assimp/libassimp3_3.0~dfsg-2_amd64.deb
-  sudo dpkg -i libassimp3_3.0~dfsg-2_amd64.deb
+  - wget http://archive.ubuntu.com/ubuntu/pool/universe/a/assimp/libassimp3_3.0~dfsg-2_amd64.deb
+  - sudo dpkg -i libassimp3_3.0~dfsg-2_amd64.deb
 
   # source dependencies: install using wstool.
   - cd ~/catkin_ws/src
