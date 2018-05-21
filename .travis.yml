@@ -76,6 +76,7 @@ before_install:
   - sudo rosdep init
   - rosdep update
   - sudo pip install catkin-tools
+  - sudo apt-get install -y ros-indigo-moveit-full-pr2
 
 # Create a catkin workspace with the package under integration.
 install:
@@ -92,10 +93,6 @@ install:
 # Install all dependencies, using wstool and rosdep.
 # wstool looks for a ROSINSTALL_FILE defined in the environment variables.
 before_script:
-
-  # https://answers.ros.org/question/203542/moveit-installation/?answer=212933#post-id-212933
-  - wget http://archive.ubuntu.com/ubuntu/pool/universe/a/assimp/libassimp3_3.0~dfsg-2_amd64.deb
-  - sudo dpkg -i libassimp3_3.0~dfsg-2_amd64.deb
 
   # source dependencies: install using wstool.
   - cd ~/catkin_ws/src
