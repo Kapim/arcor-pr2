@@ -212,7 +212,6 @@ void Objects::setGrasped(std::string object_id, bool grasped)
   {
     ROS_DEBUG_NAMED("objects", "Setting object_id as not grasped: %s", object_id.c_str());
     grasped_objects_.erase(object_id);
-
   }
 }
 }  // namespace art_pr2_grasping

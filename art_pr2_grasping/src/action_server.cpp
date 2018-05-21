@@ -30,7 +30,6 @@ void artActionServer::ce_resume()
 
 bool artActionServer::init()
 {
-
   while (!ce_pause_srv_.waitForExistence(ros::Duration(5.0)))
   {
     ROS_INFO_STREAM_NAMED(group_name_, "Waiting for collision env services...");
