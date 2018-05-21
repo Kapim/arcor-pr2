@@ -13,9 +13,7 @@ Objects::Objects(boost::shared_ptr<tf::TransformListener> tfl, std::string targe
   object_type_srv_ = nh_.serviceClient<art_msgs::getObjectType>("/art/db/object_type/get");
   obj_sub_ = nh_.subscribe("/art/object_detector/object_filtered", 1, &Objects::detectedObjectsCallback, this);
   target_frame_ = target_frame;
-  
   ce_set_pose_srv_ = nh_.serviceClient<art_msgs::PoseStampedTrigger>("/art/collision_env/detected/set_pose");
-
 }
 
 void Objects::setPaused(bool paused, bool clear)
@@ -194,13 +192,11 @@ void Objects::detectedObjectsCallback(const art_msgs::InstancesArrayConstPtr& ms
 
 void Objects::setPose(std::string object_id, geometry_msgs::PoseStamped ps)
 {
-
   ROS_WARN_STREAM(ps);
   art_msgs::PoseStampedTrigger srv;
   srv.request.ps = ps;
   srv.request.str = object_id;
   ce_set_pose_srv_.call(srv);
-
 }
 
 void Objects::setGrasped(std::string object_id, bool grasped)
@@ -219,5 +215,4 @@ void Objects::setGrasped(std::string object_id, bool grasped)
 
   }
 }
-
 }  // namespace art_pr2_grasping

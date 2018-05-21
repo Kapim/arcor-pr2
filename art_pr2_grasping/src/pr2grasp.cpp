@@ -79,7 +79,7 @@ artPr2Grasping::artPr2Grasping(boost::shared_ptr<tf::TransformListener> tfl, boo
   place_pose_pub_ = nh_.advertise<geometry_msgs::PoseArray>("/art/robot/" + group_name_ + "/debug/place_pose", 1, true);
 
   look_at_pub_ = nh_.advertise<geometry_msgs::PointStamped>("/art/robot/look_at", 10);
-  
+
   ce_clear_out_of_table_srv_ = nh_.serviceClient<art_msgs::StringTrigger>("/art/collision_env/detected/out_of_table/clear/except");
 
   publishObject();
@@ -462,12 +462,11 @@ bool artPr2Grasping::pick(const std::string& object_id, bool feeder)
 
   if (feeder)
   {
-  
     art_msgs::StringTrigger srv;
     srv.request.str = object_id;
     
-    if (!ce_clear_out_of_table_srv_.call(srv) || not srv.response.success) {
-  
+    if (!ce_clear_out_of_table_srv_.call(srv) || not srv.response.success)
+    {
       ROS_ERROR_NAMED(group_name_, "Failed to clear objects.");
       return false;
     }

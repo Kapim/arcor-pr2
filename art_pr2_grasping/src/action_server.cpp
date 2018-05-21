@@ -11,20 +11,19 @@ artActionServer::artActionServer(boost::shared_ptr<tf::TransformListener> tfl, b
 {
   as_.reset(new actionlib::SimpleActionServer<art_msgs::PickPlaceAction>(
               nh_, "/art/robot/" + group_name_ + "/pp", boost::bind(&artActionServer::executeCB, this, _1), false));
-              
+
   ce_pause_srv_ = nh_.serviceClient<std_srvs::Empty>("/art/collision_env/pause");
   ce_resume_srv_ = nh_.serviceClient<std_srvs::Empty>("/art/collision_env/resume");
-              
 }
 
-void artActionServer::ce_pause() {
-
+void artActionServer::ce_pause()
+{
   std_srvs::Empty srv;
   ce_pause_srv_.call(srv);
 }
 
-void artActionServer::ce_resume() {
-
+void artActionServer::ce_resume()
+{
   std_srvs::Empty srv;
   ce_resume_srv_.call(srv);
 }
@@ -32,21 +31,20 @@ void artActionServer::ce_resume() {
 bool artActionServer::init()
 {
 
-  while (!ce_pause_srv_.waitForExistence(ros::Duration(5.0)))  {
-  
+  while (!ce_pause_srv_.waitForExistence(ros::Duration(5.0)))
+  {
     ROS_INFO_STREAM_NAMED(group_name_, "Waiting for collision env services...");
   }
 
-  while (!ce_resume_srv_.waitForExistence(ros::Duration(5.0)))  {
-  
+  while (!ce_resume_srv_.waitForExistence(ros::Duration(5.0)))
+  {
     ROS_INFO_STREAM_NAMED(group_name_, "Waiting for collision env services...");
   }
 
-  while (!ce_clear_out_of_table_srv_.waitForExistence(ros::Duration(5.0)))  {
-  
+  while (!ce_clear_out_of_table_srv_.waitForExistence(ros::Duration(5.0)))
+  {
     ROS_INFO_STREAM_NAMED(group_name_, "Waiting for collision env services...");
   }
-
 
   while (!tfl_->waitForTransform(getPlanningFrame(), "marker", ros::Time(0), ros::Duration(5.0)))
   {
@@ -139,7 +137,6 @@ void artActionServer::executeCB(const art_msgs::PickPlaceGoalConstPtr& goal)
       // (type of failure)
       if (grasped)
         break;
-
     }
 
     if (as_->isPreemptRequested())

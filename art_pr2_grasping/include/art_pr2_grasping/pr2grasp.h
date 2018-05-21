@@ -69,7 +69,7 @@ protected:
   void look_at(const geometry_msgs::PoseStamped& ps);
 
   bool dont_try_again_;
-  
+
   ros::ServiceClient ce_clear_out_of_table_srv_;
 
 public:
@@ -89,7 +89,6 @@ public:
   void publishObject(TObjectInfo obj = TObjectInfo());
 
   bool pick(const std::string& object_id, bool feeder = false);
-
 };
 }  // namespace art_pr2_grasping
 #endif  // ART_PR2_GRASPING_PR2GRASP_H

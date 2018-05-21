@@ -77,11 +77,9 @@ private:
   bool paused_;
 
   TObjCache obj_cache_;
-  
-  ros::ServiceClient ce_set_pose_srv_;
-  
-};
 
+  ros::ServiceClient ce_set_pose_srv_;
+};
 }  // namespace art_pr2_grasping
 
 #endif  // ART_PR2_GRASPING_OBJECTS_H

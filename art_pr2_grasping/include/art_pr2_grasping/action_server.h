@@ -27,13 +27,12 @@ private:
   int max_attempts_;
 
   void executeCB(const art_msgs::PickPlaceGoalConstPtr& goal);
-  
+
   ros::ServiceClient ce_pause_srv_;
   ros::ServiceClient ce_resume_srv_;
-  
+
   void ce_pause();
   void ce_resume();
-  
 };
 }  // namespace art_pr2_grasping
 
