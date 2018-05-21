@@ -77,7 +77,7 @@ before_install:
   - rosdep update
   - sudo pip install catkin-tools
   - sudo apt-get install -y -f
-  - sudo apt-get install -y ros-indigo-moveit-full-pr2
+  - sudo apt-get install -y ros-indigo-moveit-full
 
 # Create a catkin workspace with the package under integration.
 install:
