@@ -9,6 +9,11 @@ arms:
       manipulation: yes
       move_to_user: yes
       get_ready: yes
+    name:
+      cs_CZ: Levé rameno
+      en_US: Left Arm
+    idx: 1
+    camera_link: /l_forearm_cam_optical_frame
   right_arm:
     gripper_link: r_gripper_tool_frame
     capabilities:
@@ -18,3 +23,8 @@ arms:
       manipulation: yes
       move_to_user: yes
       get_ready: yes
+    name:
+      cs_CZ: Pravé rameno
+      en_US: Right arm
+    camera_link: /r_forearm_cam_optical_frame
+    idx: 0
