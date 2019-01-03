@@ -2,6 +2,9 @@ robot_id: pr2
 arms:
   left_arm:
     gripper_link: l_gripper_tool_frame
+    base_link: l_shoulder_pan_link
+    min_range: 0.4
+    max_range: 0.85
     capabilities:
       pick_place: yes
       drill: yes
@@ -16,6 +19,9 @@ arms:
     camera_link: /l_forearm_cam_optical_frame
   right_arm:
     gripper_link: r_gripper_tool_frame
+    base_link: r_shoulder_pan_link
+    min_range: 0.4
+    max_range: 0.85
     capabilities:
       pick_place: yes
       drill: yes
