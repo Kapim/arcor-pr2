@@ -59,6 +59,10 @@ class ArtBasicControl:
         self.right_move_to_user = rospy.Service(self.ns + "right_arm/move_to_user", Trigger, self.right_interaction_move_to_user_cb)
         self.right_int_pub = rospy.Publisher(self.ns + "right_arm/interaction/state", Bool, queue_size=1, latch=True)
 
+        self.look_at_right_feeder_srv = rospy.Service(self.ns + "look_at/right_feeder", Trigger, self.look_at_right_feeder_cb)
+        self.look_at_left_feeder_srv = rospy.Service(self.ns + "look_at/left_feeder", Trigger, self.look_at_left_feeder_cb)
+        self.look_at_default_srv = rospy.Service(self.ns + "look_at/default", Trigger, self.look_at_default_cb)
+
         self.spine_up_service = rospy.Service(self.ns + "spine/up", Empty, self.spine_up_cb)
         self.spine_down_service = rospy.Service(self.ns + "spine/down", Empty, self.spine_down_cb)
         self.spine_control_sub = rospy.Subscriber(self.ns + "spine/control", Float32, self.spine_control_cb)
@@ -72,6 +76,8 @@ class ArtBasicControl:
         # TODO check actual state
         self.left_int_pub.publish(False)
         self.right_int_pub.publish(False)
+
+        self.head_moving = False
 
         rospy.loginfo("Server ready")
 
@@ -190,7 +196,7 @@ class ArtBasicControl:
             resp.success = False
         else:
 
-            resp.success = self.move(self.group_left, target="tuck_left_arm")
+            resp.success = self.move(self.group_left, target="up_left_arm")
 
         return resp
 
@@ -284,7 +290,7 @@ class ArtBasicControl:
             resp.success = False
         else:
 
-            resp.success = self.move(self.group_right, target="tuck_right_arm")
+            resp.success = self.move(self.group_right, target="up_right_arm")
 
         return resp
 
@@ -332,7 +338,7 @@ class ArtBasicControl:
 
         self.spine_move_to(height.data)
 
-    def look_at_cb(self, where):
+    def look_at_cb(self, where, send_and_wait=True):
         """ where: PoseStamped."""
 
         goal = PointHeadGoal()
@@ -340,7 +346,49 @@ class ArtBasicControl:
         goal.pointing_frame = "high_def_frame"
         goal.min_duration = rospy.Duration(0.5)
         goal.max_velocity = 0.5
-        self.head_action_client.send_goal_and_wait(goal, rospy.Duration(5))
+        if send_and_wait:
+            self.head_action_client.send_goal_and_wait(goal, rospy.Duration(5))
+        else:
+            self.head_action_client.send_goal(goal)
+
+    def look_at_left_feeder_cb(self, req):
+        resp = TriggerResponse()
+
+        point = PointStamped()
+        point.header.frame_id = "marker"
+        point.point.x = -0.325
+        point.point.y = 0.205
+        point.point.z = 0.0875
+        self.look_at_cb(point, send_and_wait=False)
+
+        resp.success = True
+        return resp
+
+    def look_at_right_feeder_cb(self, req):
+        resp = TriggerResponse()
+
+        point = PointStamped()
+        point.header.frame_id = "marker"
+        point.point.x = 1.825
+        point.point.y = 0.205
+        point.point.z = 0.0875
+        self.look_at_cb(point, send_and_wait=False)
+
+        resp.success = True
+        return resp
+
+    def look_at_default_cb(self, req):
+        resp = TriggerResponse()
+
+        pt = PointStamped()
+        pt.header.frame_id = "base_link"
+        pt.point.x = 0.4
+        pt.point.y = -0.15
+        pt.point.z = 0.8
+        self.look_at_cb(pt, send_and_wait=False)
+
+        resp.success = True
+        return resp
 
     def spine_move_to(self, height):
 
