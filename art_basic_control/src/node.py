@@ -77,8 +77,6 @@ class ArtBasicControl:
         self.left_int_pub.publish(False)
         self.right_int_pub.publish(False)
 
-        self.head_moving = False
-
         rospy.loginfo("Server ready")
 
     def publish_gripper_pose(self, time, frame_id, publisher):
