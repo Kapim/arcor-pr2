@@ -1,6 +1,6 @@
 robot_id: pr2
-  capabilities:
-    look_at: yes
+capabilities:
+  look_at: yes
 arms:
   left_arm:
     gripper_link: l_gripper_tool_frame
