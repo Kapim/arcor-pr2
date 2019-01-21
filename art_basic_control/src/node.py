@@ -162,13 +162,7 @@ class ArtBasicControl:
 
             group.set_named_target(target)
 
-            # TODO how to get end ef. pose from named target?
-            pt = PointStamped()
-            pt.header.frame_id = "base_link"
-            pt.point.x = 0.4
-            pt.point.y = -0.15
-            pt.point.z = 0.8
-            self.look_at_cb(pt)
+
 
         group.allow_looking(False)
         group.allow_replanning(False)
